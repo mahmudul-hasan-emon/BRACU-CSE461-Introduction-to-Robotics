@@ -1,0 +1,91 @@
+
+# You may need to import some classes of the controller module. Ex:
+#  from controller import Robot, Motor, DistanceSensor
+from controller import Robot
+
+# create the Robot instance.
+robot = Robot()
+
+# get the time step of the current world.
+timestep = int(robot.getBasicTimeStep())
+
+time_step=32
+max_speed = 6.28
+
+#motor
+back_right_wheel = robot.getDevice('back_right_wheel')
+back_left_wheel = robot.getDevice('back_left_wheel')
+front_right_wheel = robot.getDevice('front_right_wheel')
+front_left_wheel = robot.getDevice('front_left_wheel')
+
+back_right_wheel.setPosition(float('inf'))
+back_left_wheel.setPosition(float('inf'))
+front_right_wheel.setPosition(float('inf'))
+front_left_wheel.setPosition(float('inf'))
+
+back_right_wheel.setVelocity(0.0)
+back_left_wheel.setVelocity(0.0)
+front_right_wheel.setVelocity(0.0)
+front_left_wheel.setVelocity(0.0)
+
+# ir Sensor
+right_ir = robot.getDevice('right_sensor')
+right_ir.enable(time_step)
+mid_ir = robot.getDevice('mid_sensor')
+mid_ir.enable(time_step)
+left_ir = robot.getDevice('left_sensor')
+left_ir.enable(time_step)
+
+#simulation
+#main loop:
+# - performs simulation steps until webots is stopping the controller
+while robot.step(timestep) != -1:
+    right_ir_val = right_ir.getValue()
+    mid_ir_val = mid_ir.getValue()
+    left_ir_val = left_ir.getValue()
+
+    print("left: {} mid: {} right: {}".format(left_ir_val,mid_ir_val,right_ir_val))
+
+    right_speed = max_speed
+    left_speed = max_speed
+    
+    ir_val = 450
+#process sensor data
+    if left_ir_val>ir_val and right_ir_val>ir_val and mid_ir_val>=ir_val:
+        back_right_wheel.setVelocity(right_speed)
+        back_left_wheel.setVelocity(0)
+        front_right_wheel.setVelocity(right_speed)
+        front_left_wheel.setVelocity(0)
+
+    if left_ir_val>ir_val and right_ir_val<=ir_val and mid_ir_val>=ir_val:
+        back_right_wheel.setVelocity(0)
+        back_left_wheel.setVelocity(left_speed)
+        front_right_wheel.setVelocity(0)
+        front_left_wheel.setVelocity(left_speed)
+
+    if left_ir_val<=ir_val and right_ir_val>ir_val and mid_ir_val>=ir_val:
+        back_right_wheel.setVelocity(right_speed)
+        back_left_wheel.setVelocity(0)
+        front_right_wheel.setVelocity(right_speed)
+        front_left_wheel.setVelocity(0)
+
+    if left_ir_val<=ir_val and right_ir_val>ir_val and mid_ir_val<ir_val:
+        back_right_wheel.setVelocity(0)
+        back_left_wheel.setVelocity(left_speed)
+        front_right_wheel.setVelocity(0)
+        front_left_wheel.setVelocity(left_speed)
+
+    if left_ir_val>ir_val and right_ir_val<=ir_val and mid_ir_val<ir_val:
+        back_right_wheel.setVelocity(right_speed)
+        back_left_wheel.setVelocity(0)
+        front_right_wheel.setVelocity(right_speed)
+        front_left_wheel.setVelocity(0)
+
+    if left_ir_val>ir_val and right_ir_val>ir_val and mid_ir_val<ir_val:
+        back_right_wheel.setVelocity(right_speed)
+        back_left_wheel.setVelocity(left_speed)
+        front_right_wheel.setVelocity(right_speed)
+        front_left_wheel.setVelocity(left_speed)
+
+ 
+    pass
